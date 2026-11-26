@@ -1,0 +1,394 @@
+// backend/prisma/schema.prisma
+//
+// CineVault database schema (PostgreSQL + Prisma).
+// Thiết kế dựa trên frontend/src/types/index.ts.
+//
+// Quy ước:
+//  - Tiền tệ là VND, lưu bằng Int (không có số lẻ).
+//  - Không xóa cứng phim/series: dùng publicationStatus = HIDDEN để ẩn,
+//    vì lịch sử giao dịch vẫn cần tham chiếu tới chúng.
+//  - Giá cuối cùng (resolvedPrice) KHÔNG lưu trong DB, tính ở service:
+//      customPrice ?? pricePreset.amount
+//    còn Episode có settingSource = SEASON thì lấy cấu hình từ Season.
+//  - Trạng thái Premium KHÔNG lưu trên User, suy ra từ PremiumSubscription
+//    (có bản ghi với expirationDate > now() thì đang ACTIVE).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  LOCKED
+}
+
+enum AccessMode {
+  FREE
+  LOCKED
+}
+
+enum PublicationStatus {
+  PUBLISHED
+  HIDDEN
+}
+
+enum EpisodeSettingSource {
+  SEASON
+  OVERRIDE
+}
+
+enum TransactionType {
+  TOP_UP
+  MOVIE_UNLOCK
+  EPISODE_UNLOCK
+  SUBSCRIPTION_PAYMENT
+  ADMIN_ADJUSTMENT
+}
+
+enum TransactionStatus {
+  COMPLETED
+  FAILED
+  PENDING
+}
+
+// ─────────────────────────────────────────────────────────────
+// Users
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  passwordHash  String
+  name          String
+  avatarUrl     String?
+  role          UserRole      @default(USER)
+  accountStatus AccountStatus @default(ACTIVE)
+
+  // Số dư ví (VND). Thêm CHECK (wallet_balance >= 0) bằng SQL thô, xem docs.
+  walletBalance Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions   PremiumSubscription[]
+  transactions    WalletTransaction[]   @relation("TransactionOwner")
+  adjustmentsMade WalletTransaction[]   @relation("TransactionAdmin")
+  contentAccesses ContentAccess[]
+  watchHistory    WatchHistory[]
+  favorites       Favorite[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Giá và Premium
+// ─────────────────────────────────────────────────────────────
+
+// Các mức giá preset do admin quản lý (trang /admin/pricing).
+model PricePreset {
+  id        String   @id @default(uuid())
+  name      String
+  amount    Int // VND
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movies   Movie[]
+  series   Series[]
+  seasons  Season[]
+  episodes Episode[]
+
+  @@map("price_presets")
+}
+
+// Gói Premium (ví dụ: 1 tháng, 3 tháng).
+model PremiumPlan {
+  id           String   @id @default(uuid())
+  name         String
+  price        Int // VND
+  durationDays Int
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  subscriptions PremiumSubscription[]
+
+  @@map("premium_plans")
+}
+
+model PremiumSubscription {
+  id             String   @id @default(uuid())
+  userId         String
+  planId         String
+  startDate      DateTime @default(now())
+  expirationDate DateTime
+  pricePaid      Int // VND, snapshot lúc mua
+  createdAt      DateTime @default(now())
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan         PremiumPlan         @relation(fields: [planId], references: [id], onDelete: Restrict)
+  transactions WalletTransaction[]
+
+  @@index([userId, expirationDate])
+  @@map("premium_subscriptions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Nội dung: Movie
+// ─────────────────────────────────────────────────────────────
+
+model Movie {
+  id             String   @id @default(uuid())
+  title          String
+  originalTitle  String?
+  overview       String
+  posterUrl      String
+  backdropUrl    String?
+  genres         String[] // ví dụ ["Action", "Drama"]
+  releaseYear    Int
+  runtimeMinutes Int
+  director       String
+  cast           Json     @default("[]") // [{ name, role, photoUrl? }]
+  voteAverage    Float    @default(0)
+  popularity     Float    @default(0)
+  isFeatured     Boolean  @default(false)
+
+  trailerYoutubeId String?
+  playbackUrl      String?
+
+  publicationStatus PublicationStatus @default(HIDDEN)
+
+  // Cấu hình truy cập và giá
+  accessMode          AccessMode @default(FREE)
+  pricePresetId       String? // dùng preset...
+  customPrice         Int? // ...hoặc giá riêng (ưu tiên hơn preset)
+  unlockDurationHours Int        @default(48)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pricePreset  PricePreset?        @relation(fields: [pricePresetId], references: [id], onDelete: Restrict)
+  accesses     ContentAccess[]
+  transactions WalletTransaction[]
+  history      WatchHistory[]
+  favorites    Favorite[]
+
+  @@index([publicationStatus, popularity])
+  @@index([title])
+  @@map("movies")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Nội dung: Series > Season > Episode
+// ─────────────────────────────────────────────────────────────
+
+model Series {
+  id            String   @id @default(uuid())
+  title         String
+  originalTitle String?
+  overview      String
+  posterUrl     String
+  backdropUrl   String?
+  genres        String[]
+  releaseYear   Int
+  director      String
+  cast          Json     @default("[]")
+  voteAverage   Float    @default(0)
+  popularity    Float    @default(0)
+  isFeatured    Boolean  @default(false)
+
+  trailerYoutubeId  String?
+  publicationStatus PublicationStatus @default(HIDDEN)
+
+  // Giá trị mặc định, Season và Episode kế thừa hoặc ghi đè
+  defaultAccessMode          AccessMode @default(FREE)
+  defaultPricePresetId       String?
+  defaultCustomPrice         Int?
+  defaultUnlockDurationHours Int        @default(48)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  defaultPricePreset PricePreset? @relation(fields: [defaultPricePresetId], references: [id], onDelete: Restrict)
+  seasons            Season[]
+  favorites          Favorite[]
+
+  @@index([publicationStatus, popularity])
+  @@index([title])
+  @@map("series")
+}
+
+model Season {
+  id           String    @id @default(uuid())
+  seriesId     String
+  seasonNumber Int
+  title        String
+  overview     String?
+  airDate      DateTime?
+
+  publicationStatus PublicationStatus @default(HIDDEN)
+
+  defaultAccessMode          AccessMode @default(FREE)
+  defaultPricePresetId       String?
+  defaultCustomPrice         Int?
+  defaultUnlockDurationHours Int        @default(48)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  series             Series       @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  defaultPricePreset PricePreset? @relation(fields: [defaultPricePresetId], references: [id], onDelete: Restrict)
+  episodes           Episode[]
+
+  @@unique([seriesId, seasonNumber])
+  @@map("seasons")
+}
+
+model Episode {
+  id              String  @id @default(uuid())
+  seasonId        String
+  episodeNumber   Int
+  title           String
+  overview        String
+  thumbnailUrl    String?
+  durationMinutes Int
+  playbackUrl     String?
+
+  publicationStatus PublicationStatus @default(HIDDEN)
+
+  // SEASON: lấy cấu hình từ Season. OVERRIDE: dùng các trường bên dưới.
+  settingSource       EpisodeSettingSource @default(SEASON)
+  accessMode          AccessMode?
+  pricePresetId       String?
+  customPrice         Int?
+  unlockDurationHours Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  season       Season              @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  pricePreset  PricePreset?        @relation(fields: [pricePresetId], references: [id], onDelete: Restrict)
+  accesses     ContentAccess[]
+  transactions WalletTransaction[]
+  history      WatchHistory[]
+
+  @@unique([seasonId, episodeNumber])
+  @@map("episodes")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Quyền xem sau khi mở khóa (có thời hạn)
+// ─────────────────────────────────────────────────────────────
+//
+// Mỗi bản ghi thuộc đúng MỘT trong hai: movieId hoặc episodeId.
+// Mua lại sau khi hết hạn thì upsert (cập nhật expiresAt), lịch sử
+// mua nằm ở WalletTransaction. Thêm CHECK bằng SQL thô, xem docs.
+
+model ContentAccess {
+  id            String   @id @default(uuid())
+  userId        String
+  movieId       String?
+  episodeId     String?
+  purchasedAt   DateTime @default(now())
+  expiresAt     DateTime
+  pricePaid     Int // VND, snapshot lúc mua
+  durationHours Int
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie   Movie?   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  episode Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@unique([userId, episodeId])
+  @@index([userId, expiresAt])
+  @@map("content_accesses")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Ví và giao dịch (chỉ thêm, không sửa, không xóa)
+// ─────────────────────────────────────────────────────────────
+
+model WalletTransaction {
+  id     String            @id @default(uuid())
+  userId String
+  type   TransactionType
+  status TransactionStatus @default(COMPLETED)
+
+  amount        Int // dương = cộng ví, âm = trừ ví
+  balanceBefore Int
+  balanceAfter  Int
+
+  movieId        String?
+  episodeId      String?
+  subscriptionId String?
+  contentTitle   String? // snapshot tên, vẫn đọc được khi nội dung bị ẩn
+  durationHours  Int?
+
+  reason  String? // dùng cho ADMIN_ADJUSTMENT
+  adminId String? // admin thực hiện điều chỉnh
+
+  createdAt DateTime @default(now())
+
+  user         User                 @relation("TransactionOwner", fields: [userId], references: [id], onDelete: Restrict)
+  admin        User?                @relation("TransactionAdmin", fields: [adminId], references: [id], onDelete: SetNull)
+  movie        Movie?               @relation(fields: [movieId], references: [id], onDelete: SetNull)
+  episode      Episode?             @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+  subscription PremiumSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@map("wallet_transactions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Lịch sử xem và yêu thích
+// ─────────────────────────────────────────────────────────────
+
+model WatchHistory {
+  id              String   @id @default(uuid())
+  userId          String
+  movieId         String?
+  episodeId       String?
+  progressSeconds Int      @default(0)
+  totalSeconds    Int      @default(0)
+  lastWatchedAt   DateTime @default(now()) @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie   Movie?   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  episode Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@unique([userId, episodeId])
+  @@index([userId, lastWatchedAt])
+  @@map("watch_history")
+}
+
+model Favorite {
+  id       String   @id @default(uuid())
+  userId   String
+  movieId  String?
+  seriesId String?
+  addedAt  DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie  Movie?  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  series Series? @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@unique([userId, seriesId])
+  @@index([userId, addedAt])
+  @@map("favorites")
+}
