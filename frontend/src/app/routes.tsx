@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import PublicLayout from "@/layouts/PublicLayout";
 import AdminLayout from "@/layouts/AdminLayout";
-import HomePage from "@/pages/public/HomePage";
+import HomePage from "@/features/home/HomePage";
 import MoviesPage from "@/pages/public/MoviesPage";
 import SeriesPage from "@/pages/public/SeriesPage";
 import SearchPage from "@/pages/public/SearchPage";

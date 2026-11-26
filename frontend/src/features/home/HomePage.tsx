@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Play, Compass, Unlock, Crown, Clock, Sparkles, Wallet } from "lucide-react";
-import PosterMosaic from "@/components/home/PosterMosaic";
-import CategorySection from "@/components/home/CategorySection";
-import FAQSection from "@/components/home/FAQSection";
-import CTABanner from "@/components/home/CTABanner";
+import PosterMosaic from "./PosterMosaic";
+import CategorySection from "./CategorySection";
+import FAQSection from "./FAQSection";
+import CTABanner from "./CTABanner";
 import TrailerModal from "@/components/movie/TrailerModal";
 import UnlockModal from "@/components/movie/UnlockModal";
 import MovieCard from "@/components/movie/MovieCard";

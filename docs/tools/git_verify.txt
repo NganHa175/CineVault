@@ -1,0 +1,3 @@
+﻿4db048b Backend GD2 mini-task 1: them 6 file du lieu seed (27 phim + 9 series + anh mock + kieu du lieu)
+2b6e5b7 Giai doan 1: dua toan bo UI goc (101 file) tu figmaCinevault.txt vao frontend/src + cai 35 thu vien + cau hinh alias @ + App/main theo ban goc
+61ff64a Baseline: backup UI Figma source vao docs truoc khi port frontend
