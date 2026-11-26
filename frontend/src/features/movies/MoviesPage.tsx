@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import MovieCard from "@/components/movie/MovieCard";
-import UnlockModal from "@/components/movie/UnlockModal";
+import MovieCard from "./MovieCard";
+import UnlockModal from "./UnlockModal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { MOCK_MOVIES, ALL_GENRES } from "@/mocks/movies";
 import type { Movie } from "@/types";

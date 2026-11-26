@@ -3,10 +3,10 @@ import { useParams, Link, useNavigate } from "react-router";
 import { Play, Star, Clock, Heart, Share2, Lock, Check, Crown, ChevronLeft, Calendar, User } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { PremiumBadge } from "@/components/ui/Badge";
-import TrailerModal from "@/components/movie/TrailerModal";
-import UnlockModal from "@/components/movie/UnlockModal";
-import MovieCard from "@/components/movie/MovieCard";
-import { HorizontalScroll } from "@/components/movie/HorizontalScroll";
+import TrailerModal from "./TrailerModal";
+import UnlockModal from "./UnlockModal";
+import MovieCard from "./MovieCard";
+import { HorizontalScroll } from "./HorizontalScroll";
 import { useAuth } from "@/hooks/useAuth";
 import { MOCK_MOVIES } from "@/mocks/movies";
 

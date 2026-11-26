@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
-import MovieCard from "@/components/movie/MovieCard";
+import MovieCard from "@/features/movies/MovieCard";
 import { MOCK_MOVIES, MOCK_SERIES } from "@/mocks/movies";
 
 export default function SearchPage() {
