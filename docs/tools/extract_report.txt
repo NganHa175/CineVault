@@ -1,0 +1,168 @@
+=== WRITTEN: 101 ===
+src/app/components/figma/ImageWithFallback.tsx (28 lines)
+src/app/components/ui/accordion.tsx (67 lines)
+src/app/components/ui/alert-dialog.tsx (158 lines)
+src/app/components/ui/alert.tsx (67 lines)
+src/app/components/ui/aspect-ratio.tsx (12 lines)
+src/app/components/ui/avatar.tsx (54 lines)
+src/app/components/ui/badge.tsx (47 lines)
+src/app/components/ui/breadcrumb.tsx (110 lines)
+src/app/components/ui/button.tsx (59 lines)
+src/app/components/ui/calendar.tsx (76 lines)
+src/app/components/ui/card.tsx (93 lines)
+src/app/components/ui/carousel.tsx (242 lines)
+src/app/components/ui/chart.tsx (354 lines)
+src/app/components/ui/checkbox.tsx (33 lines)
+src/app/components/ui/collapsible.tsx (34 lines)
+src/app/components/ui/command.tsx (178 lines)
+src/app/components/ui/context-menu.tsx (253 lines)
+src/app/components/ui/dialog.tsx (136 lines)
+src/app/components/ui/drawer.tsx (133 lines)
+src/app/components/ui/dropdown-menu.tsx (258 lines)
+src/app/components/ui/form.tsx (169 lines)
+src/app/components/ui/hover-card.tsx (45 lines)
+src/app/components/ui/input-otp.tsx (78 lines)
+src/app/components/ui/input.tsx (22 lines)
+src/app/components/ui/label.tsx (25 lines)
+src/app/components/ui/menubar.tsx (277 lines)
+src/app/components/ui/navigation-menu.tsx (169 lines)
+src/app/components/ui/pagination.tsx (128 lines)
+src/app/components/ui/popover.tsx (49 lines)
+src/app/components/ui/progress.tsx (32 lines)
+src/app/components/ui/radio-group.tsx (46 lines)
+src/app/components/ui/resizable.tsx (57 lines)
+src/app/components/ui/scroll-area.tsx (59 lines)
+src/app/components/ui/select.tsx (190 lines)
+src/app/components/ui/separator.tsx (29 lines)
+src/app/components/ui/sheet.tsx (140 lines)
+src/app/components/ui/sidebar.tsx (727 lines)
+src/app/components/ui/skeleton.tsx (14 lines)
+src/app/components/ui/slider.tsx (64 lines)
+src/app/components/ui/sonner.tsx (26 lines)
+src/app/components/ui/switch.tsx (32 lines)
+src/app/components/ui/table.tsx (117 lines)
+src/app/components/ui/tabs.tsx (67 lines)
+src/app/components/ui/textarea.tsx (19 lines)
+src/app/components/ui/toggle-group.tsx (74 lines)
+src/app/components/ui/toggle.tsx (48 lines)
+src/app/components/ui/tooltip.tsx (62 lines)
+src/app/components/ui/use-mobile.ts (22 lines)
+src/app/components/ui/utils.ts (7 lines)
+src/app/images.ts (110 lines)
+src/app/routes.tsx (61 lines)
+src/components/home/CategorySection.tsx (66 lines)
+src/components/home/CTABanner.tsx (33 lines)
+src/components/home/FAQSection.tsx (58 lines)
+src/components/home/PosterMosaic.tsx (58 lines)
+src/components/movie/HorizontalScroll.tsx (61 lines)
+src/components/movie/MovieCard.tsx (123 lines)
+src/components/movie/TrailerModal.tsx (36 lines)
+src/components/movie/UnlockModal.tsx (115 lines)
+src/components/ui/Badge.tsx (64 lines)
+src/components/ui/Button.tsx (59 lines)
+src/components/ui/Modal.tsx (90 lines)
+src/components/ui/Skeleton.tsx (26 lines)
+src/hooks/useAuth.tsx (109 lines)
+src/imports/HomePageDesktop/index.tsx (2452 lines)
+src/imports/MoviesPageOpenDesktop/index.tsx (1472 lines)
+src/imports/MoviesPageOpenDesktop/svg-9gpqjaal7n.ts (46 lines)
+src/imports/MoviesShowsPageDesktop/index.tsx (4907 lines)
+src/imports/pasted_text/cinevault-frontend-refactor.md (1475 lines)
+src/imports/SubscriptionPageDesktop/index.tsx (1585 lines)
+src/layouts/AdminLayout.tsx (127 lines)
+src/layouts/PublicLayout.tsx (262 lines)
+src/mocks/homeData.ts (61 lines)
+src/mocks/movies.ts (601 lines)
+src/mocks/transactions.ts (37 lines)
+src/mocks/users.ts (62 lines)
+src/pages/admin/AdminContentPage.tsx (135 lines)
+src/pages/admin/AdminDashboardPage.tsx (135 lines)
+src/pages/admin/AdminMovieEditorPage.tsx (157 lines)
+src/pages/admin/AdminPricingPage.tsx (123 lines)
+src/pages/admin/AdminSeasonEditorPage.tsx (212 lines)
+src/pages/admin/AdminTransactionsPage.tsx (175 lines)
+src/pages/admin/AdminUsersPage.tsx (155 lines)
+src/pages/public/HomePage.tsx (221 lines)
+src/pages/public/MovieDetailPage.tsx (178 lines)
+src/pages/public/MoviesPage.tsx (168 lines)
+src/pages/public/SearchPage.tsx (75 lines)
+src/pages/public/SeriesDetailPage.tsx (155 lines)
+src/pages/public/SeriesPage.tsx (156 lines)
+src/pages/user/FavoritesPage.tsx (77 lines)
+src/pages/user/HistoryPage.tsx (107 lines)
+src/pages/user/ProfilePage.tsx (67 lines)
+src/pages/user/SubscriptionPage.tsx (163 lines)
+src/pages/user/WalletPage.tsx (161 lines)
+src/pages/user/WatchPage.tsx (124 lines)
+src/styles/fonts.css (2 lines)
+src/styles/index.css (4 lines)
+src/styles/tailwind.css (5 lines)
+src/styles/theme.css (182 lines)
+src/types/index.ts (211 lines)
+src/vite-env.d.ts (2 lines)
+=== SKIPPED (already exist): 2 ===
+src/app/App.tsx
+src/main.tsx
+=== IGNORED non-src headers ===
+Structure
+package.json
+.figma/backup/package.json
+.figma/make/dev.json
+.figma/make/migrated-package-aliases.json
+.figma/make/site.json
+.mise.toml
+AGENTS.md
+ATTRIBUTIONS.md
+CLAUDE.md
+default_shadcn_theme.css
+guidelines/Guidelines.md
+index.html
+pnpm-workspace.yaml
+postcss.config.mjs
+tsconfig.json
+vite.config.ts
+vite.figma.config.ts
+=== PACKAGES REFERENCED ===
+@radix-ui/react-accordion
+@radix-ui/react-alert-dialog
+@radix-ui/react-aspect-ratio
+@radix-ui/react-avatar
+@radix-ui/react-checkbox
+@radix-ui/react-collapsible
+@radix-ui/react-context-menu
+@radix-ui/react-dialog
+@radix-ui/react-dropdown-menu
+@radix-ui/react-hover-card
+@radix-ui/react-label
+@radix-ui/react-menubar
+@radix-ui/react-navigation-menu
+@radix-ui/react-popover
+@radix-ui/react-progress
+@radix-ui/react-radio-group
+@radix-ui/react-scroll-area
+@radix-ui/react-select
+@radix-ui/react-separator
+@radix-ui/react-slider
+@radix-ui/react-slot
+@radix-ui/react-switch
+@radix-ui/react-tabs
+@radix-ui/react-toggle
+@radix-ui/react-toggle-group
+@radix-ui/react-tooltip
+class-variance-authority
+clsx
+cmdk
+embla-carousel-react
+input-otp
+lucide-react
+next-themes
+react
+react-day-picker
+react-dom/client
+react-hook-form
+react-resizable-panels
+react-router
+recharts
+sonner
+tailwind-merge
+vaul
