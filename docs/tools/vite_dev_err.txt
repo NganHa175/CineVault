@@ -1,0 +1,23 @@
+[2m12:35:08 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to resolve import "@/imports/HomePageDesktop/717aebdf85ae7888bc0e52f172ffedeba0dc2ce7.png" from "src/app/images.ts". Does the file exist?
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/ngan/OneDrive/Desktop/year_4/hk1/project/CineVault/frontend/src/app/images.ts[39m:3:31
+[33m  1  |  // ── Shared posters (HomePageDesktop) ─────────────────────────────────────────
+  2  |  export { default as p00 } from "@/imports/HomePageDesktop/866dc7a345cf53372ec7d06e4e2671c64ad4b14c.png";
+  3  |  export { default as p01 } from "@/imports/HomePageDesktop/717aebdf85ae7888bc0e52f172ffedeba0dc2ce7.png";
+     |                                  ^
+  4  |  export { default as p02 } from "@/imports/HomePageDesktop/7a2d7c975a5dab16addcff652a11945988d43f90.png";
+  5  |  export { default as p03 } from "@/imports/HomePageDesktop/69ee4b568e62d232af3f756cc95979d784fb000f.png";[39m
+[2m12:35:08 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to resolve import "@/imports/HomePageDesktop/717aebdf85ae7888bc0e52f172ffedeba0dc2ce7.png" from "src/app/images.ts". Does the file exist?
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/ngan/OneDrive/Desktop/year_4/hk1/project/CineVault/frontend/src/app/images.ts[39m:3:31
+[33m  1  |  // ── Shared posters (HomePageDesktop) ─────────────────────────────────────────
+  2  |  export { default as p00 } from "@/imports/HomePageDesktop/866dc7a345cf53372ec7d06e4e2671c64ad4b14c.png";
+  3  |  export { default as p01 } from "@/imports/HomePageDesktop/717aebdf85ae7888bc0e52f172ffedeba0dc2ce7.png";
+     |                                  ^
+  4  |  export { default as p02 } from "@/imports/HomePageDesktop/7a2d7c975a5dab16addcff652a11945988d43f90.png";
+  5  |  export { default as p03 } from "@/imports/HomePageDesktop/69ee4b568e62d232af3f756cc95979d784fb000f.png";[39m
+[33m[vite:css][postcss] @import statements must precede all other statements (besides @charset or empty @layer) and be consecutive
+2  |  @import './tailwind.css';
+3  |  @import './theme.css';
+4  |  
+   |  ^[39m
